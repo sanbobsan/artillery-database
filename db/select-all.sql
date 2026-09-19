@@ -8,7 +8,7 @@ SELECT
     r.title AS rank,
     e.title AS equipment,
     p.station_height,
-    wind_direction p.temperature,
+    p.temperature,
     p.pressure,
     p.wind_direction,
     p.wind_speed,
