@@ -6,7 +6,7 @@ VALUES ('Рядовой'),
     ('Сержант'),
     ('Лейтенант'),
     ('Капитан')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (title) DO NOTHING;
 
 INSERT INTO
     equipment_types (id, title, abbreviation)
@@ -19,15 +19,16 @@ VALUES (
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO
-    users (name, surname, rank_id)
-VALUES ('Иван', 'Иванов', 1),
-    ('Петр', 'Петров', 2),
-    ('Алексей', 'Сидоров', 3),
-    ('Иван', 'Смирнов', 1)
+    users (id, name, surname, rank_id)
+VALUES (1, 'Иван', 'Иванов', 1),
+    (2, 'Петр', 'Петров', 2),
+    (3, 'Алексей', 'Сидоров', 3),
+    (4, 'Иван', 'Смирнов', 1)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO
     parameters (
+        id,
         equipment_type_id,
         station_height,
         temperature,
@@ -35,12 +36,13 @@ INSERT INTO
         wind_direction,
         wind_speed
     )
-VALUES (1, 101, 26.4, 762, 55, 8),
-    (1, 105, 22.1, 734, 12, 3)
+VALUES (1, 1, 101, 26.4, 762, 55, 8),
+    (2, 1, 105, 22.1, 734, 12, 3)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO
     parameters (
+        id,
         equipment_type_id,
         station_height,
         temperature,
@@ -48,12 +50,12 @@ INSERT INTO
         wind_direction,
         bullet_drift_distance
     )
-VALUES (2, 160, -10.0, 670, 12, 72)
+VALUES (3, 2, 160, -10.0, 670, 12, 72)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO
-    measurements (user_id, parameters_id)
-VALUES (1, 1),
-    (3, 2),
-    (4, 3)
+    measurements (id, user_id, parameters_id)
+VALUES (1, 1, 1),
+    (2, 3, 2),
+    (3, 4, 3)
 ON CONFLICT (id) DO NOTHING;
