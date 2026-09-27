@@ -10,4 +10,4 @@ JOIN employees e ON e.id = mb.employee_id
 JOIN parameters p ON p.id = m.parameter_id
 JOIN parameter_types pt ON pt.id = p.parameter_type_id
 JOIN units u ON u.id = p.unit_id
-ORDER BY m.measurements_bucket_id;
+ORDER BY m.measurements_bucket_id, m.parameter_id;

@@ -3,55 +3,55 @@
 -- не после миграции
 
 -- Воинские звания
-INSERT INTO military_ranks (title)
-VALUES ('Рядовой'),
-    ('Сержант'),
-    ('Лейтенант'),
-    ('Капитан')
+INSERT INTO military_ranks (id, title)
+VALUES (1, 'Рядовой'),
+    (2, 'Сержант'),
+    (3, 'Лейтенант'),
+    (4, 'Капитан')
 ON CONFLICT DO NOTHING;
 
 -- Сотрудники
-INSERT INTO employees (name, surname, rank_id)
-VALUES ('Иван', 'Иванов', 1),
-    ('Петр', 'Петров', 2),
-    ('Алексей', 'Сидоров', 3),
-    ('Иван', 'Смирнов', 1)
+INSERT INTO employees (id, name, surname, rank_id)
+VALUES (1, 'Иван', 'Иванов', 1),
+    (2, 'Петр', 'Петров', 2),
+    (3, 'Алексей', 'Сидоров', 3),
+    (4, 'Иван', 'Смирнов', 1)
 ON CONFLICT DO NOTHING;
 
 -- Оборудование
-INSERT INTO equipment_types (title, abbreviation)
-VALUES ('Десантный метеокомплект', 'ДМК'),
-    ('Ветровое ружье', 'ВР')
+INSERT INTO equipment_types (id, title, abbreviation)
+VALUES (1, 'Десантный метеокомплект', 'ДМК'),
+    (2, 'Ветровое ружье', 'ВР')
 ON CONFLICT DO NOTHING;
 
 -- Типы параметров
-INSERT INTO parameter_types (title)
-VALUES ('Высота метеопоста'),
-    ('Температура'),
-    ('Давление'),
-    ('Направление ветра'),
-    ('Скорость ветра'),
-    ('Дальность сноса пуль')
+INSERT INTO parameter_types (id, title)
+VALUES (1, 'Высота метеопоста'),
+    (2, 'Температура'),
+    (3, 'Давление'),
+    (4, 'Направление ветра'),
+    (5, 'Скорость ветра'),
+    (6, 'Дальность сноса пуль')
 ON CONFLICT DO NOTHING;
 
 -- Единицы измерения
-INSERT INTO units (title, abbreviation)
-VALUES ('Метр', 'м'),
-    ('1/10 градуса по Цельсию', '*C/10'),
-    ('Миллиметр ртутного столба', 'мм рт. ст.'),
-    ('Деление угломера', 'дел. угл.'),
-    ('Метр в секунду', 'м/с'),
-    ('Градус по Цельсию', '*C')
+INSERT INTO units (id, title, abbreviation)
+VALUES (1, 'Метр', 'м'),
+    (2, '1/10 градуса по Цельсию', '*C/10'),
+    (3, 'Миллиметр ртутного столба', 'мм рт. ст.'),
+    (4, 'Деление угломера', 'дел. угл.'),
+    (5, 'Метр в секунду', 'м/с'),
+    (6, 'Градус по Цельсию', '*C')
 ON CONFLICT DO NOTHING;
 
 -- Связка параметров и единиц измерения
-INSERT INTO parameters (parameter_type_id, unit_id)
-VALUES (1, 1),
-    (2, 2),
-    (3, 3),
-    (4, 4),
-    (5, 5),
-    (6, 1)
+INSERT INTO parameters (id, parameter_type_id, unit_id)
+VALUES (1, 1, 1),
+    (2, 2, 2),
+    (3, 3, 3),
+    (4, 4, 4),
+    (5, 5, 5),
+    (6, 6, 1)
 ON CONFLICT DO NOTHING;
 
 -- Правила конвертации единиц
@@ -62,10 +62,10 @@ ON CONFLICT DO NOTHING;
 
 -- Вставка самих измерений
 -- Пачки измерений
-INSERT INTO measurements_buckets (employee_id)
-VALUES (1), -- Сотрудник 1
-    (3), -- Сотрудник 3
-    (4) -- Сотрудник 4
+INSERT INTO measurements_buckets (id, employee_id)
+VALUES (1, 1), -- Сотрудник 1
+    (2, 3), -- Сотрудник 3
+    (3, 4) -- Сотрудник 4
 ON CONFLICT DO NOTHING;
 
 -- Измерения
