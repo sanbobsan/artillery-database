@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS unit_conversions (
     -- parameter_type_id INT NOT NULL, -- Можно добавить для проверки типа параметра
     from_unit_id INT NOT NULL,
     to_unit_id INT NOT NULL,
-    value DECIMAL(10)
+    from_value DECIMAL(10),
+    to_value DECIMAL(10)
     -- Можно сделать primary key комбинацию из айди начальных и конечных единиц измерения
 );
