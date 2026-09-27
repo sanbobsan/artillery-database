@@ -24,6 +24,8 @@ services:
       - "127.0.0.1:${PGADMIN_PORT:-8000}:80"
     depends_on:
       - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
     restart: unless-stopped
 
 volumes:
