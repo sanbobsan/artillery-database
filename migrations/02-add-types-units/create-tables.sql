@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS parameter_types;
 DROP TABLE IF EXISTS units;
 DROP TABLE IF EXISTS measurements;
 DROP TABLE IF EXISTS measurements_bucket;
+DROP TABLE IF EXISTS unit_conversions;
 
 -- Звания
 CREATE TABLE IF NOT EXISTS military_ranks (
