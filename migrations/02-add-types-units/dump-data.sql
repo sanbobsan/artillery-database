@@ -45,13 +45,13 @@ VALUES (1, 'Метр', 'м'),
 ON CONFLICT DO NOTHING;
 
 -- Связка параметров и единиц измерения
-INSERT INTO parameters (id, parameter_type_id, unit_id)
-VALUES (1, 1, 1),
-    (2, 2, 2),
-    (3, 3, 3),
-    (4, 4, 4),
-    (5, 5, 5),
-    (6, 6, 1)
+INSERT INTO parameters (id, parameter_type_id, unit_id, default_value, min_value, max_value)
+VALUES (1, 1, 1, 100, NULL, NULL),
+    (2, 2, 2, 150, -580, 580), -- десятые градуса
+    (3, 3, 3, 750, 500, 900),
+    (4, 4, 4, 0, 0, 59),
+    (5, 5, 5, 0, 0, 15),
+    (6, 6, 1, 0, 0, 150)
 ON CONFLICT DO NOTHING;
 
 -- Правила конвертации единиц

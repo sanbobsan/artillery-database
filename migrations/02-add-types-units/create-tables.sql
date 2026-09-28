@@ -46,7 +46,10 @@ CREATE TABLE units (
 CREATE TABLE parameters (
     "id" INT PRIMARY KEY,
     "parameter_type_id" INT NOT NULL,
-    "unit_id" INT NOT NULL
+    "unit_id" INT NOT NULL,
+    "default_value" DECIMAL(10, 0) NULL, -- Если NULL, то ноль, NULL для совместимости
+    "min_value" DECIMAL(10, 0) NULL,
+    "max_value" DECIMAL(10, 0) NULL
 );
 
 -- Измерения
