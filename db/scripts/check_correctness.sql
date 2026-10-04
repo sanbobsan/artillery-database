@@ -46,7 +46,8 @@ LEFT JOIN (
   )
   GROUP BY employee_id
 ) AS measurements_count ON measurements_count.employee_id = e.id
-LEFT JOIN military_ranks mr ON mr.id = e.rank_id;
+LEFT JOIN military_ranks mr ON mr.id = e.rank_id
+ORDER BY "count", e.id;
 
 -- Проверка 2: У нас нет пустых пачек измерения.
 -- Создаю временную таблицу, чтобы не дублировать ее в нескольких запросах
