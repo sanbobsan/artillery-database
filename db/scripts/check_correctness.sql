@@ -49,36 +49,48 @@ LEFT JOIN (
 LEFT JOIN military_ranks mr ON mr.id = e.rank_id
 ORDER BY "count", e.id;
 
--- Проверка 2: У нас нет пустых пачек измерения.
--- Создаю временную таблицу, чтобы не дублировать ее в нескольких запросах
--- Выбираем пачки с количеством измерений
-CREATE TEMPORARY TABLE measurements_buckets_with_count AS -- measurements buckets with measurements count
-SELECT mb.id, COUNT(measurements_bucket_id), mb.employee_id
-FROM measurements_buckets mb
-LEFT JOIN measurements m ON m.measurements_bucket_id = mb.id
-GROUP BY mb.id
-ORDER BY mb.id;
+-- -- Создавал временную таблицу, чтобы не дублировать ее в нескольких запросах, использовать ее во второй и третьей проверках
+-- -- Выбираем пачки с количеством измерений
+-- CREATE TEMPORARY TABLE measurements_buckets_with_count AS -- measurements buckets with measurements count
+-- SELECT mb.id, COUNT(measurements_bucket_id), mb.employee_id
+-- FROM measurements_buckets mb
+-- LEFT JOIN measurements m ON m.measurements_bucket_id = mb.id
+-- GROUP BY mb.id
+-- ORDER BY mb.id;
 
-SELECT measurements_buckets_with_count.id, "count" AS "Количество измерений в пачке", e.id, e.name, e.surname
-FROM measurements_buckets_with_count -- Использую временную таблицу
+-- Проверка 2: У нас нет пустых пачек измерения.
+SELECT mb.id, "count" AS "Количество измерений в пачке", e.id, e.name, e.surname
+FROM ( -- Этот подзапрос дублируется в третьей проверке, он будет закеширован после первого выполнения
+  SELECT mb.id, COUNT(measurements_bucket_id), mb.employee_id
+  FROM measurements_buckets mb
+  LEFT JOIN measurements m ON m.measurements_bucket_id = mb.id
+  GROUP BY mb.id
+  ORDER BY mb.id
+) AS mb -- measurements_buckets_with_count
 -- Объединяем с пользователями, чтобы видеть, у кого пустые пачки
-LEFT JOIN employees e ON e.id = measurements_buckets_with_count.employee_id
+LEFT JOIN employees e ON e.id = mb.employee_id
 -- Выбираем только пустые пачки
 WHERE "count" = 0;
 
 -- Проверка 3: Каждая пачка измерений содержит полное количеситво параметров (5 шт)?
 -- То же самое, только проверять нужно не на 0 а на то, что их ровно 5
 -- Моя схема не позволяет создавать измерения одного и того же параметра в пачке, поэтому этой проверки хватает, чтобы сказать, что пасчка правильна или нет
-SELECT measurements_buckets_with_count.id, "count" AS "Количество измерений в пачке", e.id, e.name, e.surname,
+SELECT mb.id, "count" AS "Количество измерений в пачке", e.id, e.name, e.surname,
   CASE -- Добавляем столбец с правильностью пачки для наглядности
     WHEN "count" = 5 THEN 'Правильно'
     ELSE 'Неправильно'
   END AS "Правильность пачки"
-FROM measurements_buckets_with_count -- Использую временную таблицу
+FROM ( -- Этот подзапрос дублируется во второй проверке, он будет закеширован после первого выполнения
+  SELECT mb.id, COUNT(measurements_bucket_id), mb.employee_id
+  FROM measurements_buckets mb
+  LEFT JOIN measurements m ON m.measurements_bucket_id = mb.id
+  GROUP BY mb.id
+  ORDER BY mb.id
+) AS mb -- measurements_buckets_with_count
 -- Объединяем с пользователями, чтобы видеть, у правильные или неправильные пачки
-LEFT JOIN employees e ON e.id = measurements_buckets_with_count.employee_id
+LEFT JOIN employees e ON e.id = mb.employee_id
 -- Сортируем по правильности
-ORDER BY "Правильность пачки" DESC, measurements_buckets_with_count.id; -- DESC, чтобы сначала шли правильные
+ORDER BY "Правильность пачки" DESC, mb.id; -- DESC, чтобы сначала шли правильные
 
 -- Проверка 4: Все значения который сформировал корректны и в рамках нужного нам диаппазонов?
 -- Вывожу m.measurements_bucket_id, parameter_id, потому что они образуют PK
