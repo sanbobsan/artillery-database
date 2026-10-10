@@ -11,7 +11,6 @@ services:
       - 127.0.0.1:${POSTGRES_FORWARD_PORT:-5432}:5432
     volumes:
       - pg_data:/var/lib/postgresql/data
-    restart: unless-stopped
 
   pgadmin:
     image: dpage/pgadmin4
@@ -26,7 +25,6 @@ services:
       - postgres
     volumes:
       - pgadmin_data:/var/lib/pgadmin
-    restart: unless-stopped
 
 volumes:
   pg_data:
