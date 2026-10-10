@@ -112,5 +112,5 @@ BEGIN
 
     ALTER TABLE unit_conversions ADD CONSTRAINT fk_unit_conversions_to
         FOREIGN KEY (to_unit_id) REFERENCES units (id);
-END;
-$$;
+COMMIT;
+END $$;

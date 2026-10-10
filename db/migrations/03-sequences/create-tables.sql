@@ -105,5 +105,5 @@ BEGIN
         to_value DECIMAL(10, 0),
         PRIMARY KEY (from_unit_id, to_unit_id)
     );
-END;
-$$;
+COMMIT;
+END $$;
