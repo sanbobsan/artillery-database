@@ -113,6 +113,56 @@ BEGIN
             to_value DECIMAL(10, 0),
             PRIMARY KEY (from_unit_id, to_unit_id)
         );
+
+        COMMENT ON TABLE military_ranks IS 'Воинские звания';
+        COMMENT ON COLUMN military_ranks.id IS 'Идентификатор звания';
+        COMMENT ON COLUMN military_ranks.title IS 'Наименование звания';
+
+        COMMENT ON TABLE employees IS 'Работники (военнослужащие)';
+        COMMENT ON COLUMN employees.id IS 'Идентификатор работника';
+        COMMENT ON COLUMN employees.name IS 'Имя';
+        COMMENT ON COLUMN employees.surname IS 'Фамилия';
+        COMMENT ON COLUMN employees.rank_id IS 'Ссылка на звание';
+
+        COMMENT ON TABLE equipment_types IS 'Типы оборудования для измерений';
+        COMMENT ON COLUMN equipment_types.id IS 'Идентификатор типа оборудования';
+        COMMENT ON COLUMN equipment_types.title IS 'Наименование типа оборудования';
+        COMMENT ON COLUMN equipment_types.abbreviation IS 'Аббревиатура';
+
+        COMMENT ON TABLE parameter_types IS 'Типы параметров';
+        COMMENT ON COLUMN parameter_types.id IS 'Идентификатор типа параметра';
+        COMMENT ON COLUMN parameter_types.title IS 'Наименование типа параметра';
+
+        COMMENT ON TABLE units IS 'Единицы измерения';
+        COMMENT ON COLUMN units.id IS 'Идентификатор единицы измерения';
+        COMMENT ON COLUMN units.title IS 'Наименование единицы измерения';
+        COMMENT ON COLUMN units.abbreviation IS 'Аббревиатура';
+
+        COMMENT ON TABLE parameters IS 'Параметры с единицами измерения (не хранит измерения)';
+        COMMENT ON COLUMN parameters.id IS 'Идентификатор параметра';
+        COMMENT ON COLUMN parameters.parameter_type_id IS 'Ссылка на тип параметра';
+        COMMENT ON COLUMN parameters.unit_id IS 'Ссылка на единицу измерения';
+        COMMENT ON COLUMN parameters.default_value IS 'Значение по умолчанию';
+        COMMENT ON COLUMN parameters.min_value IS 'Минимально допустимое значение';
+        COMMENT ON COLUMN parameters.max_value IS 'Максимально допустимое значение';
+
+        COMMENT ON TABLE measurements_buckets IS 'Пачки измерений';
+        COMMENT ON COLUMN measurements_buckets.id IS 'Идентификатор пачки';
+        COMMENT ON COLUMN measurements_buckets.employee_id IS 'Ссылка на работника, сделавшего замер';
+
+        COMMENT ON TABLE measurements IS 'Измерения';
+        COMMENT ON COLUMN measurements.measurements_bucket_id IS 'Ссылка на пачку измерений';
+        COMMENT ON COLUMN measurements.equipment_type_id IS 'Ссылка на тип оборудования';
+        COMMENT ON COLUMN measurements.parameter_id IS 'Ссылка на параметр';
+        COMMENT ON COLUMN measurements.created_at IS 'Дата и время создания измерения';
+        COMMENT ON COLUMN measurements."value" IS 'Значение измерения';
+
+        COMMENT ON TABLE unit_conversions IS 'Перевод единиц измерения';
+        COMMENT ON COLUMN unit_conversions.from_unit_id IS 'Исходная единица измерения';
+        COMMENT ON COLUMN unit_conversions.to_unit_id IS 'Целевая единица измерения';
+        COMMENT ON COLUMN unit_conversions.from_value IS 'Значение в исходной единице';
+        COMMENT ON COLUMN unit_conversions.to_value IS 'Значение в целевой единице';
+
         COMMIT; -- Делаем коммит, таким образом выделяем транзакцию и завершаем ее
     END; -- Блок закончился
 
@@ -125,6 +175,11 @@ BEGIN
             temperature DECIMAL(3, 1) PRIMARY KEY,
             correction DECIMAL(2, 1) NOT NULL
         );
+
+        COMMENT ON TABLE calc.temperature_correction IS 'Температурные поправки';
+        COMMENT ON COLUMN calc.temperature_correction.temperature IS 'Температура';
+        COMMENT ON COLUMN calc.temperature_correction.correction IS 'Поправка';
+
         -- Данные этих таблиц зашиты в базу данных, поэтому их изменение считаются миграцией
         INSERT INTO calc.temperature_correction (temperature, correction) 
         VALUES
