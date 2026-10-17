@@ -16,6 +16,10 @@ BEGIN
     ASSERT calc.calculate_temperature_correction(25.0) = 2.00, 
     'Ошибка: Точное попадание в 25';
 
+    -- В интервале 20-25 (23.0 -> поправка 1.8)
+    ASSERT calc.calculate_temperature_correction(23.0) = 1.8, 
+    'Ошибка: В интервале 20-25 (23)';
+
     -- В интервале (13 -> поправка 1.0)
     ASSERT calc.calculate_temperature_correction(13.0) = 1.00, 
     'Ошибка: В интервале 10-15 (13)';
