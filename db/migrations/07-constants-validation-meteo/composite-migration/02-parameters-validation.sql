@@ -1,16 +1,20 @@
 
--- Таблица ошибок 1:1 к параметрам, тип "Список параметров"
+-- Таблица ошибок к параметрам, тип "Список параметров"
 -- и функция проверки корректности параметров
 
 DO $$
 BEGIN
-    -- Создание таблицы ошибок со связью 1:1 к reference.parameters
+    -- Создание таблицы ошибок
     DROP TABLE IF EXISTS reference.parameter_errors CASCADE;
+    DROP SEQUENCE IF EXISTS reference.seq_parameter_errors;
 
+    CREATE SEQUENCE reference.seq_parameter_errors;
     CREATE TABLE reference.parameter_errors (
-        parameter_id INT PRIMARY KEY REFERENCES reference.parameters (id) ON DELETE CASCADE,
+        id INT NOT NULL DEFAULT nextval('reference.seq_parameter_errors') PRIMARY KEY,
+        parameter_id INT REFERENCES reference.parameters (id) ON DELETE CASCADE,
         error_message VARCHAR(255) NOT NULL
     );
+    ALTER SEQUENCE reference.seq_parameter_errors OWNED BY reference.parameter_errors.id;
 
     COMMENT ON TABLE reference.parameter_errors IS 'Сообщения об ошибках для входных параметров';
     COMMENT ON COLUMN reference.parameter_errors.parameter_id IS 'Идентификатор параметра';
