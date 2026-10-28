@@ -27,28 +27,24 @@ VALUES
     (-101, 1, 3, 765),
     (-101, 1, 4, 15),
     (-101, 1, 5, 6),
-
     -- Пачка -102 все корректно
     (-102, 2, 1, 60),
     (-102, 2, 2, 230),
     (-102, 2, 3, 743),
     (-102, 2, 4, 10),
     (-102, 2, 6, 50),
-
     -- Пачка -103 неверное давление
     (-103, 1, 1, 100),
     (-103, 1, 2, 150),
     (-103, 1, 3, 950),
     (-103, 1, 4, 10),
     (-103, 1, 5, 5),
-
     -- Пачка -104 неверная температура и скорость ветра
     (-104, 1, 1, 100),
     (-104, 1, 2, 650),
     (-104, 1, 3, 750),
     (-104, 1, 4, 20),
     (-104, 1, 5, 20),
-
     -- Пачка -105 неверное направление ветра
     (-105, 2, 1, 100),
     (-105, 2, 2, 30),
@@ -58,29 +54,34 @@ VALUES
 
 
 -- ЗАПРОС 1: Список параметров с ошибками
-WITH batch AS (
+WITH batch_wo_parameters_list AS (
     SELECT
         mb.id AS batch_id,
         MAX(m.equipment_type_id) AS equipment_type_id,
         MAX(m.created_at) AS measured_at,
-        MAX(m."value") FILTER (WHERE m.parameter_id = 1) AS height,
+        MAX(m."value") FILTER (WHERE m.parameter_id = 1) AS "height",
         MAX(m."value") FILTER (WHERE m.parameter_id = 2) AS temperature,
         MAX(m."value") FILTER (WHERE m.parameter_id = 3) AS pressure,
         MAX(m."value") FILTER (WHERE m.parameter_id = 4) AS wind_direction,
         MAX(m."value") FILTER (WHERE m.parameter_id = 5) AS wind_speed,
-        MAX(m."value") FILTER (WHERE m.parameter_id = 6) AS bullet_drift,
-        ( -- Наш составной тип
-            MAX(m.equipment_type_id),
-            MAX(m."value") FILTER (WHERE m.parameter_id = 1),
-            MAX(m."value") FILTER (WHERE m.parameter_id = 2),
-            MAX(m."value") FILTER (WHERE m.parameter_id = 3),
-            MAX(m."value") FILTER (WHERE m.parameter_id = 4),
-            MAX(m."value") FILTER (WHERE m.parameter_id = 5),
-            MAX(m."value") FILTER (WHERE m.parameter_id = 6)
-        )::calc.parameters_list AS params
+        MAX(m."value") FILTER (WHERE m.parameter_id = 6) AS bullet_drift
     FROM public.measurement_batches mb
     LEFT JOIN public.measurements m ON m.measurement_batch_id = mb.id
     GROUP BY mb.id
+),
+batch AS (
+    SELECT 
+        *, 
+        ( -- Наш составной тип
+            equipment_type_id,
+            "height",
+            temperature,
+            pressure,
+            wind_direction,
+            wind_speed,
+            bullet_drift
+        )::calc.parameters_list AS params
+    FROM batch_wo_parameters_list
 ),
 batch_validated AS (
     SELECT
