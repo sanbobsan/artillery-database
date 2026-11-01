@@ -293,8 +293,6 @@ BEGIN
 
     INSERT INTO calc.temperature_correction (temperature, correction) VALUES (0, 0), (50, 5), (100, 10), (150, 10), (200, 15), (250, 20), (300, 35), (400, 45);
     
-    INSERT INTO calc.constants (code, title, "value", unit_id) VALUES ('NORMAL_PRESSURE', 'Табличное наземное давление (мм рт. ст.)', 750, 3), ('NORMAL_VIRTUAL_TEMP', 'Табличная приземная виртуальная температура (*C/10)', 159, 2);
-    
     INSERT INTO reference.military_ranks (title) VALUES ('Рядовой'), ('Ефрейтор'), ('Младший сержант'), ('Сержант'), ('Старший сержант'), ('Старшина'), ('Прапорщик'), ('Старший прапорщик'), ('Младший лейтенант'), ('Лейтенант'), ('Старший лейтенант'), ('Капитан'), ('Майор'), ('Подполковник'), ('Полковник');
     
     INSERT INTO reference.equipment_types (title, abbreviation) VALUES ('Десантный метеокомплект', 'ДМК'), ('Ветровое ружье', 'ВР');
@@ -302,6 +300,8 @@ BEGIN
     INSERT INTO reference.parameter_types (title) VALUES ('Высота метеопоста'), ('Температура'), ('Давление'), ('Направление ветра'), ('Скорость ветра'), ('Дальность сноса пуль');
     
     INSERT INTO reference.units (title, abbreviation) VALUES ('Метр', 'м'), ('1/10 градуса по Цельсию', '*C/10'), ('Миллиметр ртутного столба', 'мм рт. ст.'), ('Деление угломера', 'дел. угл.'), ('Метр в секунду', 'м/с'), ('Градус по Цельсию', '*C');
+    
+    INSERT INTO calc.constants (code, title, "value", unit_id) VALUES ('NORMAL_PRESSURE', 'Табличное наземное давление (мм рт. ст.)', 750, 3), ('NORMAL_VIRTUAL_TEMP', 'Табличная приземная виртуальная температура (*C/10)', 159, 2);
     
     INSERT INTO reference.parameters (parameter_type_id, unit_id, default_value, min_value, max_value) VALUES (1, 1, 100, NULL, NULL), (2, 2, 150, -580, 580), (3, 3, 750, 500, 900), (4, 4, 0, 0, 59), (5, 5, 0, 0, 15), (6, 1, 0, 0, 150);
     
