@@ -5,7 +5,21 @@
 DO $$
 BEGIN
     -- ========================================================================
-    -- 1. Создание структур (Таблицы и связи)
+    -- Очистка перед повторным выполнением
+    -- ========================================================================
+
+    DROP TABLE IF EXISTS calc.corrections CASCADE;
+    DROP TABLE IF EXISTS calc.correction_types CASCADE;
+    DROP TABLE IF EXISTS calc.correction_headers CASCADE;
+    DROP TABLE IF EXISTS calc.correction_heights CASCADE;
+
+    DROP SEQUENCE IF EXISTS calc.corrections_seq CASCADE;
+    DROP SEQUENCE IF EXISTS calc.correction_types_seq CASCADE;
+    DROP SEQUENCE IF EXISTS calc.correction_headers_seq CASCADE;
+    DROP SEQUENCE IF EXISTS calc.correction_heights_seq CASCADE;
+
+    -- ========================================================================
+    -- 1. Создание структур
     -- ========================================================================
 
     -- Таблица высот
@@ -38,9 +52,9 @@ BEGIN
     CREATE SEQUENCE IF NOT EXISTS calc.correction_types_seq;
     CREATE TABLE calc.correction_types (
         id INT NOT NULL PRIMARY KEY DEFAULT nextval('calc.correction_types_seq'),
-        parent_id INT REFERENCES calc.correction_types(id) ON DELETE CASCADE,
-        measurment_equipment_id INT REFERENCES reference.equipment_types(id) ON DELETE CASCADE, 
-        header_id INT REFERENCES calc.correction_headers(id) ON DELETE SET NULL,
+        parent_id INT,
+        measurment_equipment_id INT, 
+        header_id INT,
         description TEXT NOT NULL
     );
     ALTER SEQUENCE calc.correction_types_seq OWNED BY calc.correction_types.id;
@@ -56,8 +70,8 @@ BEGIN
     CREATE SEQUENCE IF NOT EXISTS calc.corrections_seq;
     CREATE TABLE calc.corrections (
         id integer NOT NULL PRIMARY KEY DEFAULT nextval('calc.corrections_seq'),
-        height_id integer NOT NULL REFERENCES calc.correction_heights(id) ON DELETE CASCADE,
-        correction_type_id integer NOT NULL REFERENCES calc.correction_types(id) ON DELETE CASCADE,
+        height_id integer NOT NULL,
+        correction_type_id integer NOT NULL,
         row_values integer[] NOT NULL
     );
     ALTER SEQUENCE calc.corrections_seq OWNED BY calc.corrections.id;
@@ -67,6 +81,27 @@ BEGIN
     COMMENT ON COLUMN calc.corrections.height_id IS 'Код высоты';
     COMMENT ON COLUMN calc.corrections.correction_type_id IS 'Код типа таблиц';
     COMMENT ON COLUMN calc.corrections.row_values IS 'Массив значений корректировок';
+
+    -- Реализуем связи
+    ALTER TABLE calc.correction_types
+        ADD CONSTRAINT fk_corr_types_parent_id
+        FOREIGN KEY (parent_id) REFERENCES calc.correction_types(id) ON DELETE CASCADE;
+
+    ALTER TABLE calc.correction_types
+        ADD CONSTRAINT fk_corr_types_equip_id
+        FOREIGN KEY (measurment_equipment_id) REFERENCES reference.equipment_types(id) ON DELETE CASCADE;
+
+    ALTER TABLE calc.correction_types
+        ADD CONSTRAINT fk_corr_types_header_id
+        FOREIGN KEY (header_id) REFERENCES calc.correction_headers(id) ON DELETE SET NULL;
+
+    ALTER TABLE calc.corrections
+        ADD CONSTRAINT fk_corrections_height_id
+        FOREIGN KEY (height_id) REFERENCES calc.correction_heights(id) ON DELETE CASCADE;
+
+    ALTER TABLE calc.corrections
+        ADD CONSTRAINT fk_corrections_type_id
+        FOREIGN KEY (correction_type_id) REFERENCES calc.correction_types(id) ON DELETE CASCADE;
 
     -- ========================================================================
     -- 2. Наполнение данными
