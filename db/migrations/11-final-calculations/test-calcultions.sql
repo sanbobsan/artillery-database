@@ -66,6 +66,20 @@ FROM calc.calculate_meteo_heights_formatted(
         750,  -- pressure
         0,    -- wind_direction
         0,    -- wind_speed
-        0     -- bullet_drift
+        134     -- bullet_drift
+    )::calc.parameters_list
+);
+
+-- Неправильный запрос
+SELECT * 
+FROM calc.calculate_meteo_heights_formatted(
+    ROW(
+        2,    -- equipment_type_id
+        100,  -- height
+        150,  -- temperature
+        750,  -- pressure
+        0,    -- wind_direction
+        0,    -- wind_speed
+        3333     -- bullet_drift
     )::calc.parameters_list
 );
