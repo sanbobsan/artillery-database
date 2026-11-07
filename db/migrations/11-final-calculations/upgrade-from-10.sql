@@ -139,33 +139,75 @@ BEGIN
     $func$;
 
     -- ========================================================================
-    -- ФУНКЦИЯ ФОРМАТИРОВАНИЯ: Обертка для отображения
+    -- ФУНКЦИИ ФОРМАТИРОВАНИЯ: Обертка для отображения
     -- ========================================================================
+
+    -- Функция форматирования высоты (H)
+    CREATE OR REPLACE FUNCTION calc.format_h(p_height INT)
+    RETURNS VARCHAR(2)
+    LANGUAGE plpgsql IMMUTABLE
+    AS $func$
+    BEGIN
+        IF p_height IS NULL THEN RETURN '00'; END IF;
+        RETURN LPAD((p_height / 100)::INT::TEXT, 2, '0');
+    END;
+    $func$;
+
+    -- Функция форматирования температуры (TT)
+    CREATE OR REPLACE FUNCTION calc.format_tt(p_delta_t INT)
+    RETURNS VARCHAR(2)
+    LANGUAGE plpgsql IMMUTABLE
+    AS $func$
+    BEGIN
+        IF p_delta_t IS NULL THEN RETURN '00'; END IF;
+        IF p_delta_t < 0 THEN
+            RETURN LPAD((ABS(p_delta_t) + 50)::TEXT, 2, '0');
+        ELSE
+            RETURN LPAD(p_delta_t::TEXT, 2, '0');
+        END IF;
+    END;
+    $func$;
+
+    -- Функция форматирования направления ветра (HH)
+    CREATE OR REPLACE FUNCTION calc.format_hh(p_direction INT)
+    RETURNS VARCHAR(2)
+    LANGUAGE plpgsql IMMUTABLE
+    AS $func$
+    BEGIN
+        IF p_direction IS NULL THEN RETURN '00'; END IF;
+        RETURN LPAD((p_direction % 60)::TEXT, 2, '0');
+    END;
+    $func$;
+
+    -- Функция форматирования скорости ветра (CC)
+    CREATE OR REPLACE FUNCTION calc.format_cc(p_speed INT)
+    RETURNS VARCHAR(2)
+    LANGUAGE plpgsql IMMUTABLE
+    AS $func$
+    BEGIN
+        IF p_speed IS NULL THEN RETURN '00'; END IF;
+        RETURN LPAD(p_speed::TEXT, 2, '0');
+    END;
+    $func$;
+
     CREATE OR REPLACE FUNCTION calc.calculate_meteo_heights_formatted(
         p_params calc.parameters_list
     )
     RETURNS TABLE (
-        height VARCHAR(2), -- высота
+        h VARCHAR(2), -- высота
         tt VARCHAR(2), -- отклонение температуры
         hh VARCHAR(2), -- направление ветра
         cc VARCHAR(2) -- скорость ветра
     )
     LANGUAGE sql STABLE
     AS $func$
-        SELECT 
-            -- Высота
-            LPAD((r.height / 100)::INT::TEXT, 2, '0')::VARCHAR as height,
-            
-            -- Форматирование TT (|x| + 50 для отрицательных)
-            LPAD(CASE WHEN r.delta_t < 0 THEN (ABS(r.delta_t) + 50) ELSE r.delta_t END::TEXT, 2, '0')::VARCHAR AS tt,
-            
-            -- Форматирование HH
-            LPAD(r.wind_direction::TEXT, 2, '0')::VARCHAR AS hh,
-            
-            -- Форматирование CC
-            LPAD(r.wind_speed::TEXT, 2, '0')::VARCHAR AS cc
-            
-        FROM calc.calculate_meteo_heights(p_params) r;
-    $func$;
+    SELECT 
+        calc.format_h(r.height) AS h, -- H
+        calc.format_tt(r.delta_t) AS tt, -- TT
+        calc.format_hh(r.wind_direction) AS hh, -- HH
+        calc.format_cc(r.wind_speed) AS cc -- CC
+        
+    FROM calc.calculate_meteo_heights(p_params) r;
+$func$;
 
 END $$;
