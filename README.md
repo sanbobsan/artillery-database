@@ -1,3 +1,3 @@
-# artillery database
+# database course
 
 Репозиторий для курса "Базы данных (продвинутый уровень)"
