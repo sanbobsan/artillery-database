@@ -1,5 +1,7 @@
 -- ============================================================================
--- СКРИПТ: src - зеркало Front (MSSQL -> Postgres)
+-- СКРИПТ:
+-- - src - зеркало Front (MSSQL -> Postgres) - STG (Staging)
+-- - dwh - DWH (Data Warehouse)
 -- ============================================================================
 
 DO $$
@@ -137,5 +139,121 @@ BEGIN
     );
     ALTER SEQUENCE src.size_seq OWNED BY src.size.id;
     COMMENT ON TABLE src.size IS 'Единицы измерения (size)';
+
+END $$;
+
+
+DO $$
+BEGIN
+    CREATE SCHEMA IF NOT EXISTS dwh;
+
+    DROP TABLE IF EXISTS dwh.fact_purchase CASCADE;
+    DROP TABLE IF EXISTS dwh.fact_sales CASCADE;
+    DROP TABLE IF EXISTS dwh.fact_personnel_activity CASCADE;
+    DROP TABLE IF EXISTS dwh.fact_inventory CASCADE;
+
+    DROP TABLE IF EXISTS dwh.dim_product CASCADE;
+    DROP TABLE IF EXISTS dwh.dim_vendor CASCADE;
+    DROP TABLE IF EXISTS dwh.dim_personnel CASCADE;
+    DROP TABLE IF EXISTS dwh.dim_time CASCADE;
+
+    DROP SEQUENCE IF EXISTS dwh.dim_product_seq CASCADE;
+    DROP SEQUENCE IF EXISTS dwh.dim_vendor_seq CASCADE;
+    DROP SEQUENCE IF EXISTS dwh.dim_personnel_seq CASCADE;
+    DROP SEQUENCE IF EXISTS dwh.fact_purchase_seq CASCADE;
+    DROP SEQUENCE IF EXISTS dwh.fact_sales_seq CASCADE;
+
+    -- Измерения ------------------------------------------------------------
+
+    CREATE TABLE dwh.dim_time (
+        time_code INT NOT NULL PRIMARY KEY, -- вида 202611
+        month_start DATE NOT NULL,
+        month_end DATE NOT NULL,
+        month_name VARCHAR(20) NOT NULL,
+        year INT NOT NULL,
+        quarter_num INT NOT NULL,
+        quarter_name VARCHAR(20) NOT NULL
+    );
+    COMMENT ON TABLE dwh.dim_time IS 'Месяцы';
+
+    CREATE SEQUENCE IF NOT EXISTS dwh.dim_product_seq;
+    CREATE TABLE dwh.dim_product (
+        id INT NOT NULL PRIMARY KEY DEFAULT nextval('dwh.dim_product_seq'),
+        external_id INT NOT NULL UNIQUE, -- из src
+        article INT,
+        name VARCHAR(255),
+        category_name VARCHAR(255)
+    );
+    ALTER SEQUENCE dwh.dim_product_seq OWNED BY dwh.dim_product.id;
+    COMMENT ON TABLE dwh.dim_product IS 'Товары (product)';
+
+    CREATE SEQUENCE IF NOT EXISTS dwh.dim_vendor_seq;
+    CREATE TABLE dwh.dim_vendor (
+        id INT NOT NULL PRIMARY KEY DEFAULT nextval('dwh.dim_vendor_seq'),
+        external_id INT NOT NULL UNIQUE, -- из src
+        name VARCHAR(255),
+        group_name VARCHAR(255)
+    );
+    ALTER SEQUENCE dwh.dim_vendor_seq OWNED BY dwh.dim_vendor.id;
+    COMMENT ON TABLE dwh.dim_vendor IS 'Поставщики (vendors)';
+
+    CREATE SEQUENCE IF NOT EXISTS dwh.dim_personnel_seq;
+    CREATE TABLE dwh.dim_personnel (
+        id INT NOT NULL PRIMARY KEY DEFAULT nextval('dwh.dim_personnel_seq'),
+        external_id INT NOT NULL UNIQUE, -- из src
+        full_name TEXT,
+        role_name VARCHAR(255)
+    );
+    ALTER SEQUENCE dwh.dim_personnel_seq OWNED BY dwh.dim_personnel.id;
+    COMMENT ON TABLE dwh.dim_personnel IS 'Сотрудники (personnel)';
+
+    -- Факты ----------------------------------------------------------------
+
+    CREATE SEQUENCE IF NOT EXISTS dwh.fact_purchase_seq;
+    CREATE TABLE dwh.fact_purchase (
+        id INT NOT NULL PRIMARY KEY DEFAULT nextval('dwh.fact_purchase_seq'),
+        time_code INT NOT NULL REFERENCES dwh.dim_time(time_code),
+        product_id INT NOT NULL REFERENCES dwh.dim_product(id),
+        vendor_id INT NOT NULL REFERENCES dwh.dim_vendor(id),
+        document_id INT,
+        quantity NUMERIC(18, 4), -- количество
+        amount NUMERIC(18, 2) -- на сумму
+    );
+    ALTER SEQUENCE dwh.fact_purchase_seq OWNED BY dwh.fact_purchase.id;
+    COMMENT ON TABLE dwh.fact_purchase IS 'Закупки';
+
+    CREATE SEQUENCE IF NOT EXISTS dwh.fact_sales_seq;
+    CREATE TABLE dwh.fact_sales (
+        id INT NOT NULL PRIMARY KEY DEFAULT nextval('dwh.fact_sales_seq'),
+        time_code INT NOT NULL REFERENCES dwh.dim_time(time_code),
+        product_id INT NOT NULL REFERENCES dwh.dim_product(id),
+        personnel_id INT NOT NULL REFERENCES dwh.dim_personnel(id),
+        receipt_number BIGINT,
+        quantity NUMERIC(18, 3), -- количество
+        revenue NUMERIC(18, 2) -- на сумму
+    );
+    ALTER SEQUENCE dwh.fact_sales_seq OWNED BY dwh.fact_sales.id;
+    COMMENT ON TABLE dwh.fact_sales IS 'Продажи';
+
+    CREATE TABLE dwh.fact_personnel_activity (
+        time_code INT NOT NULL REFERENCES dwh.dim_time(time_code),
+        personnel_id INT NOT NULL REFERENCES dwh.dim_personnel(id),
+        activity VARCHAR(255) NOT NULL, -- тип работы
+        operations_count INT NOT NULL DEFAULT 0, -- количество операций этого типа
+        amount NUMERIC(18, 2), -- на сумму
+        PRIMARY KEY (time_code, personnel_id, activity)
+    );
+    COMMENT ON TABLE dwh.fact_personnel_activity IS 'Работа персонала';
+
+    CREATE TABLE dwh.fact_inventory (
+        time_code INT NOT NULL REFERENCES dwh.dim_time(time_code),
+        product_id INT NOT NULL REFERENCES dwh.dim_product(id),
+        unit_id INT NOT NULL,
+        unit_name VARCHAR(255),
+        quantity NUMERIC(18, 4), -- количество
+        amount NUMERIC(18, 2), -- на сумму
+        PRIMARY KEY (time_code, product_id, unit_id)
+    );
+    COMMENT ON TABLE dwh.fact_inventory IS 'Остатки';
 
 END $$;
