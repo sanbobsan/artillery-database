@@ -39,7 +39,8 @@ BEGIN
         documenttypeid INT,
         period TIMESTAMP,
         amount NUMERIC(18, 2),
-        personid INT
+        personid INT,
+        date_add TIMESTAMP DEFAULT now()
     );
     ALTER SEQUENCE src.bm_journalbarnetdocs_seq OWNED BY src.bm_journalbarnetdocs.id;
     COMMENT ON TABLE src.bm_journalbarnetdocs IS 'Шапки документов (bm_JournalBarnetDocs)';
@@ -53,7 +54,8 @@ BEGIN
         vendorid INT,
         rangeid INT,
         count NUMERIC(18, 4),
-        amount NUMERIC(18, 2)
+        amount NUMERIC(18, 2),
+        date_add TIMESTAMP DEFAULT now()
     );
     ALTER SEQUENCE src.bm_storageoperations_seq OWNED BY src.bm_storageoperations.id;
     COMMENT ON TABLE src.bm_storageoperations IS 'Строки операций (bm_StorageOperations)';
@@ -65,7 +67,8 @@ BEGIN
         description VARCHAR(255),
         categoryid INT,
         vendorid INT,
-        sizeid INT
+        sizeid INT,
+        date_add TIMESTAMP DEFAULT now()
     );
     ALTER SEQUENCE src.product_seq OWNED BY src.product.id;
     COMMENT ON TABLE src.product IS 'Продукты (product)';
@@ -74,7 +77,8 @@ BEGIN
     CREATE TABLE src.category (
         id INT NOT NULL PRIMARY KEY DEFAULT nextval('src.category_seq'),
         description VARCHAR(255),
-        parentid INT
+        parentid INT,
+        date_add TIMESTAMP DEFAULT now()
     );
     ALTER SEQUENCE src.category_seq OWNED BY src.category.id;
     COMMENT ON TABLE src.category IS 'Категории (category)';
@@ -83,7 +87,8 @@ BEGIN
     CREATE TABLE src.vendors (
         id INT NOT NULL PRIMARY KEY DEFAULT nextval('src.vendors_seq'),
         firstname VARCHAR(255),
-        clientgroup INT
+        clientgroup INT,
+        date_add TIMESTAMP DEFAULT now()
     );
     ALTER SEQUENCE src.vendors_seq OWNED BY src.vendors.id;
     COMMENT ON TABLE src.vendors IS 'Поставщики (vendors)';
@@ -95,7 +100,8 @@ BEGIN
         firstname VARCHAR(255),
         middlename VARCHAR(255),
         securityaccess INT,
-        deleteflag INT
+        deleteflag INT,
+        date_add TIMESTAMP DEFAULT now()
     );
     ALTER SEQUENCE src.personnel_seq OWNED BY src.personnel.personid;
     COMMENT ON TABLE src.personnel IS 'Сотрудники (personnel)';
@@ -103,7 +109,8 @@ BEGIN
     CREATE SEQUENCE IF NOT EXISTS src.bm_journaltypedocuments_seq;
     CREATE TABLE src.bm_journaltypedocuments (
         id INT NOT NULL PRIMARY KEY DEFAULT nextval('src.bm_journaltypedocuments_seq'),
-        description VARCHAR(255)
+        description VARCHAR(255),
+        date_add TIMESTAMP DEFAULT now()
     );
     ALTER SEQUENCE src.bm_journaltypedocuments_seq OWNED BY src.bm_journaltypedocuments.id;
     COMMENT ON TABLE src.bm_journaltypedocuments IS 'Виды документов (bm_JournalTypeDocuments)';
@@ -112,7 +119,8 @@ BEGIN
     CREATE TABLE src.bm_storageoperationstype (
         id INT NOT NULL PRIMARY KEY DEFAULT nextval('src.bm_storageoperationstype_seq'),
         description VARCHAR(255),
-        factor INT
+        factor INT,
+        date_add TIMESTAMP DEFAULT now()
     );
     ALTER SEQUENCE src.bm_storageoperationstype_seq OWNED BY src.bm_storageoperationstype.id;
     COMMENT ON TABLE src.bm_storageoperationstype IS 'Виды операций (bm_StorageOperationsType)';
@@ -127,7 +135,8 @@ BEGIN
         description VARCHAR(255),
         quantity NUMERIC(18, 3),
         amount NUMERIC(18, 2),
-        loginid INT
+        loginid INT,
+        date_add TIMESTAMP DEFAULT now()
     );
     ALTER SEQUENCE src.journal_seq OWNED BY src.journal.transnumber;
     COMMENT ON TABLE src.journal IS 'Журнал транзакций (journal)';
@@ -135,7 +144,8 @@ BEGIN
     CREATE SEQUENCE IF NOT EXISTS src.transtype_seq;
     CREATE TABLE src.transtype (
         transtypeid INT NOT NULL PRIMARY KEY DEFAULT nextval('src.transtype_seq'),
-        description VARCHAR(255)
+        description VARCHAR(255),
+        date_add TIMESTAMP DEFAULT now()
     );
     ALTER SEQUENCE src.transtype_seq OWNED BY src.transtype.transtypeid;
     COMMENT ON TABLE src.transtype IS 'Типы транзакций (transtype)';
@@ -143,14 +153,16 @@ BEGIN
     CREATE SEQUENCE IF NOT EXISTS src.vendorgroup_seq;
     CREATE TABLE src.vendorgroup (
         vendorgroupid INT NOT NULL PRIMARY KEY DEFAULT nextval('src.vendorgroup_seq'),
-        description VARCHAR(255)
+        description VARCHAR(255),
+        date_add TIMESTAMP DEFAULT now()
     );
     ALTER SEQUENCE src.vendorgroup_seq OWNED BY src.vendorgroup.vendorgroupid;
     COMMENT ON TABLE src.vendorgroup IS 'Группы поставщиков (vendorgroup)';
 
     CREATE TABLE src.securityaccess (
         securityaccessid INT,
-        description VARCHAR(255)
+        description VARCHAR(255),
+        date_add TIMESTAMP DEFAULT now()
     );
     COMMENT ON TABLE src.securityaccess IS 'Роли (securityaccess)';
 
@@ -159,7 +171,8 @@ BEGIN
         id INT NOT NULL PRIMARY KEY DEFAULT nextval('src.size_seq'),
         sizeid VARCHAR(50),
         description VARCHAR(255),
-        portionrate NUMERIC(18, 3)
+        portionrate NUMERIC(18, 3),
+        date_add TIMESTAMP DEFAULT now()
     );
     ALTER SEQUENCE src.size_seq OWNED BY src.size.id;
     COMMENT ON TABLE src.size IS 'Единицы измерения (size)';
