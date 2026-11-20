@@ -21,6 +21,7 @@ services:
     ports:
       - 127.0.0.1:${POSTGRES_FORWARD_PORT:-5432}:5432
     volumes:
+      - ./csv:/csv
       - pg_data:/var/lib/postgresql/data
 
 volumes:
